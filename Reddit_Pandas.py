@@ -43,11 +43,11 @@ class RedditPanda:
         """Logs you into reddit's api.
         """
 
-        return praw.Reddit(client_id=client_id,
+        reddit_login = praw.Reddit(client_id=client_id,
                      client_secret=client_key,
                      user_agent=user_agent)
 
-        # Check we are conn ected
+        # Check we are connected to Reddit correctly.
         try:
             reddit_login.random_subreddit()
         except ResponseException:
@@ -274,8 +274,7 @@ class RedditPanda:
 
         # Get the Red Pandas
         dest_url = self.get('redpandas', method=method, limit=limit, 
-            weight=weight, no_ext=no_ext, save=save, 
-            recreate_list=recreate_list)
+            weight=weight)
 
         # Update the microsoft terminal.
         if update_terminal:
@@ -289,7 +288,7 @@ class RedditPanda:
         animated_formats = ['mp4', 'gif']
 
         for url in url_list:
-            _, ext = _check_media_type(url)
+            _, ext = self._check_media_type(url)
 
             #if ext in 
 
