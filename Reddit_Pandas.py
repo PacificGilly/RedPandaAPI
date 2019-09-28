@@ -210,7 +210,16 @@ class RedditPanda:
 
         return panda_urls
 
-    def _update_terminal(self, url):
+    def _get_profile(self, json_file, name):
+        """Get the profile name in Windows Terminal Setting file."""
+
+        for i, profile in enumerate(json_file['profiles']):
+            if name == profile['name']:
+                return i
+        
+        raise NameError("Couldn't find name of profile in the settings list.")
+
+    def _update_terminal(self, url, profile=None):
         """Update the new Microsoft terminal background image.
         """
 
@@ -219,14 +228,20 @@ class RedditPanda:
         with open(self.settings_path, 'r') as file:
             json_file = json.load(file)
 
-        json_file['profiles'][1]['backgroundImage'] = url + 'tmp'
+        # Find the profile name
+        profile = self._get_profile(json_file, profile) \
+            if profile is not None \
+            else 0
+        
+        # Update background image with random name
+        json_file['profiles'][profile]['backgroundImage'] = url + 'tmp'
 
         with open(self.settings_path, 'w') as file:
             json.dump(json_file, file)
 
         time.sleep(0.5)
-
-        json_file['profiles'][1]['backgroundImage'] = url
+        
+        json_file['profiles'][profile]['backgroundImage'] = url
 
         with open(self.settings_path, 'w') as file:
             json.dump(json_file, file)
@@ -325,11 +340,14 @@ class RedditPanda:
 
         return dest_url
 
-    def update_terminal(self, subreddit, method='top', limit=1000, weight=True, 
-            refresh=False):
+    def update_terminal(self, profile, subreddit, method='top', limit=1000, 
+            weight=True, refresh=False):
         """Randomly gets a single image/video from a subreddit and 
         updates the new Microsoft Terminal.
 
+        :param profile : str
+            The name of the profile in Windows Terminal you want to 
+            change to background for.
         :param subreddit : str
             The subreddit you want to get an image/gif/video from.
         :param method : str, optional
@@ -352,10 +370,10 @@ class RedditPanda:
             weight=weight, refresh=refresh)
 
         # Update the microsoft terminal.
-        self._update_terminal(dest_url)
+        self._update_terminal(dest_url, profile=profile)
 
-    def update_windows_background(self, subreddit, method='top', limit=1000, weight=True, 
-            refresh=False):
+    def update_windows_background(self, subreddit, method='top', limit=1000, 
+            weight=True, refresh=False):
         """Randomly gets a single image/video from a subreddit and 
         updates the windows background.
 
@@ -400,6 +418,7 @@ if __name__ == "__main__":
 
     # Get a single panda image at random
     while True:
-        pandas.update_terminal('redpandas', refresh=False)
+        pandas.update_terminal(profile="CMD with Red Pandas2", 
+            subreddit='redpandas', refresh=False)
 
         time.sleep(5)
